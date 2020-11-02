@@ -39,21 +39,22 @@ public class MainActivity extends AppCompatActivity {
 
             if(action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
             {
-                statusTextView.setText("Finished.");
+                statusTextView.setText("Done.");
                 Button button = findViewById(R.id.searchButton);
                 button.setEnabled(true);
             }
             else if(BluetoothDevice.ACTION_FOUND.equals(action))
             {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if(device.getName() == null)
+                /*if(device.getName() == null)
                 {
                     deviceList.add("DEVICE: " + device.getAddress() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm");
                 }
-                else if(device.getName() != null)
+                else*/ if(device.getName() != null)
                 {
                     deviceList.add("DEVICE: " + device.getName() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm");
                 }
+
                 adapter.notifyDataSetChanged();
             }
         }
@@ -62,15 +63,14 @@ public class MainActivity extends AppCompatActivity {
     public void onSearchClicked(View view) {
         int hasPermission = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION);
         if (hasPermission == PackageManager.PERMISSION_GRANTED) {
-            statusTextView.setText("Searching...");
+            statusTextView.setText("Detecting devices...");
             deviceList.clear();
             bluetoothAdapter.startDiscovery();
             view.setEnabled(false);
         }
 
         ActivityCompat.requestPermissions(MainActivity.this,
-                new String[]{
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
                 REQUEST_COARSE_LOCATION_PERMISSIONS);
     }
 
