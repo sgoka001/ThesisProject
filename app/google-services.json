@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "771624309072",
+    "firebase_url": "https://gradthesis-cc6da.firebaseio.com",
+    "project_id": "gradthesis-cc6da",
+    "storage_bucket": "gradthesis-cc6da.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771624309072:android:ada0db5a9bb9148ac9dc55",
+        "android_client_info": {
+          "package_name": "com.example.thesisproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771624309072-0tv0oos9oq88hrnef0m52lr0sivf1egn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.thesisproject",
+            "certificate_hash": "4c4efdc4a08334507e49b55a33e878e4ec87da00"
+          }
+        },
+        {
+          "client_id": "771624309072-vjdfsa6h3v09108oog1im4hc7sd9vg4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC52UXj0pCey2gjRbSixjaMaXaDToaNipM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771624309072-vjdfsa6h3v09108oog1im4hc7sd9vg4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
