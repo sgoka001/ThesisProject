@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     int REQUEST_COARSE_LOCATION_PERMISSIONS = 1;
 
     DataStructure dataStructure;
+    EditText conditions_holder;
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                         deviceList.add("DEVICE: " + device.getName() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm");
                         short hold = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                         final double myInt = hold;
+                        final String conditions = conditions_holder.getText().toString();
 
                         //DATABASE
                         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -85,12 +88,8 @@ public class MainActivity extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Log.v("register1", dataSnapshot.getChildren().iterator().next().getKey());
                                 Log.v("register", String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1));
-                                dataStructure = new DataStructure(device.getName(), myInt, "null");
+                                dataStructure = new DataStructure(device.getName(), myInt, conditions);
                                 myRef.child(String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1)).setValue(dataStructure);
-
-                                Log.v("userid", dataSnapshot.getChildren().iterator().next().getKey());
-
-                                //finish();
                             }
 
                             @Override
@@ -105,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                         deviceList.add("DEVICE: " + device.getName() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm");
                         short hold = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                         final double myInt = hold;
+                        final String converted_conditions = conditions_holder.getText().toString();
 
                         //DATABASE
                         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -116,12 +116,8 @@ public class MainActivity extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Log.v("register1", dataSnapshot.getChildren().iterator().next().getKey());
                                 Log.v("register", String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1));
-                                dataStructure = new DataStructure(device.getName(), myInt, "null");
+                                dataStructure = new DataStructure(device.getName(), myInt, converted_conditions);
                                 myRef.child(String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1)).setValue(dataStructure);
-
-                                Log.v("userid", dataSnapshot.getChildren().iterator().next().getKey());
-
-                                //finish();
                             }
 
                             @Override
@@ -161,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
         deviceList = new ArrayList<>();
         adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, deviceList);
         listView.setAdapter(adapter);
+
+        conditions_holder = findViewById(R.id.conditions_text);
 
         //BLUETOOTH
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
