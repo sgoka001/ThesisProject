@@ -30,6 +30,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +41,11 @@ public class MainActivity extends AppCompatActivity {
     List<String> deviceList;
     ArrayAdapter adapter;
     TextView statusTextView;
+    EditText conditions_holder;
 
     BluetoothAdapter bluetoothAdapter;
     int REQUEST_COARSE_LOCATION_PERMISSIONS = 1;
-
     DataStructure dataStructure;
-    EditText conditions_holder;
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
                 statusTextView.setText("Done.");
                 Button button = findViewById(R.id.searchButton);
                 button.setEnabled(true);
-            } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            }
+            else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 /*if(device.getName() == null)
                 {
@@ -65,73 +66,59 @@ public class MainActivity extends AppCompatActivity {
                 else*/
                 if (device.getName() != null) {
                     //deviceList.add("DEVICE: " + device.getName() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm" + " code: " + device.hashCode());
-                    if (device.hashCode() == -897224467) //LG TV hashcode
-                    {
-                        deviceList.add("FOUND MY TV");
-                        deviceList.add("DEVICE: " + device.getName() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm");
-                    }
-                    else if (device.hashCode() == -2108813337) //macbook hashcode
+                    short hold = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+                    final double rssi = hold;
+                    final String conditions = conditions_holder.getText().toString();
+                    final Date date = new Date();
+
+                    if (device.hashCode() == -2108813337) //macbook hashcode
                     {
                         deviceList.add("FOUND MY MACBOOK");
                         deviceList.add("DEVICE: " + device.getName() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm");
-                        short hold = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-                        final double myInt = hold;
-                        final String conditions = conditions_holder.getText().toString();
-
                         //DATABASE
                         FirebaseDatabase database = FirebaseDatabase.getInstance();
                         final DatabaseReference myRef = database.getReference();
                         Query query = myRef.orderByKey().limitToLast(1);
                         query.addListenerForSingleValueEvent(new ValueEventListener() {
-
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Log.v("register1", dataSnapshot.getChildren().iterator().next().getKey());
                                 Log.v("register", String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1));
-                                dataStructure = new DataStructure(device.getName(), myInt, conditions);
+                                dataStructure = new DataStructure(device.getName(), rssi, conditions, date.toString());
                                 myRef.child(String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1)).setValue(dataStructure);
                             }
-
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                             }
                         });
 
                     }
-                    else if (device.hashCode() == -1149078512) //my laptop hashcode
+                    else if (device.hashCode() == -1149078512) //work laptop hashcode
                     {
                         deviceList.add("FOUND MY LAPTOP");
                         deviceList.add("DEVICE: " + device.getName() + "\nRSSI: " + intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) + "dBm");
-                        short hold = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-                        final double myInt = hold;
-                        final String converted_conditions = conditions_holder.getText().toString();
-
                         //DATABASE
                         FirebaseDatabase database = FirebaseDatabase.getInstance();
                         final DatabaseReference myRef = database.getReference();
                         Query query = myRef.orderByKey().limitToLast(1);
                         query.addListenerForSingleValueEvent(new ValueEventListener() {
-
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Log.v("register1", dataSnapshot.getChildren().iterator().next().getKey());
                                 Log.v("register", String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1));
-                                dataStructure = new DataStructure(device.getName(), myInt, converted_conditions);
+                                dataStructure = new DataStructure(device.getName(), rssi, conditions, date.toString());
                                 myRef.child(String.valueOf(Integer.parseInt(dataSnapshot.getChildren().iterator().next().getKey()) + 1)).setValue(dataStructure);
                             }
-
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                             }
                         });
                     }
                 }
-
                 adapter.notifyDataSetChanged();
-                }
+            }
             }
     };
-
 
     public void onSearchClicked(View view) {
         int hasPermission = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -141,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
             bluetoothAdapter.startDiscovery();
             view.setEnabled(false);
         }
-
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
                 REQUEST_COARSE_LOCATION_PERMISSIONS);
@@ -157,14 +143,12 @@ public class MainActivity extends AppCompatActivity {
         deviceList = new ArrayList<>();
         adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, deviceList);
         listView.setAdapter(adapter);
-
         conditions_holder = findViewById(R.id.conditions_text);
 
         //BLUETOOTH
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         IntentFilter intentFilter = new IntentFilter();
-
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -172,7 +156,5 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED);
 
         registerReceiver(broadcastReceiver, intentFilter);
-
     }
-
 }
